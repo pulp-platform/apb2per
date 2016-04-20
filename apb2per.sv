@@ -50,9 +50,9 @@ module apb2per
    input logic                       per_master_r_opc_i,
    input logic [31:0]                per_master_r_rdata_i
 );
-   
+
    enum  logic  { TRANS_IDLE, TRANS_RUN } CS, NS;
-   
+
    // UPDATE THE STATE
    always_ff @(posedge clk_i, negedge rst_ni)
    begin
@@ -65,33 +65,37 @@ module apb2per
          CS <= NS;
       end
    end
-   
+
    // COMPUTE NEXT STATE
    always_comb
    begin
-   
+
       per_master_we_o  = 0;
       per_master_req_o = 0;
       PREADY = 0;
-      
+
       case(CS)
-        
+
          TRANS_IDLE:
          begin
             if ( PSEL == 1 && PENABLE == 1 )
             begin
                per_master_req_o = 1;
+
+               if ( PWRITE == 1 )
+                 per_master_we_o = 1'b1;
+               else
+                 per_master_we_o = 1'b0;
+
                if ( per_master_gnt_i == 1 )
                begin
                   if ( PWRITE == 1 )
                   begin
-                     per_master_we_o = 1;
                      PREADY          = 1;
                      NS              = TRANS_IDLE;
                   end
                   else
                   begin
-                     per_master_we_o  = 0;
                      PREADY           = 0;
                      NS               = TRANS_RUN;
                   end
@@ -108,7 +112,7 @@ module apb2per
                PREADY = 0;
             end
          end //~TRANS_IDLE
-     
+
 
 
          TRANS_RUN:
@@ -124,7 +128,7 @@ module apb2per
                NS = TRANS_RUN;
             end
          end //~TRANS_RUN
-     
+
 
 
          default :
@@ -134,13 +138,12 @@ module apb2per
 
       endcase
    end
-   
+
    assign PRDATA  = per_master_r_rdata_i;
    assign PSLVERR = '0;
 
    assign per_master_add_o   = PADDR;
    assign per_master_wdata_o = PWDATA;
-   assign per_master_r_opc_i = '0;
    assign per_master_be_o    = '1;
-   
+
 endmodule
