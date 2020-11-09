@@ -1,0 +1,10 @@
+package:
+  name: apb2per
+  authors: 
+    - "Michael Gautschi"
+    - "Florent Rotenberg <florent.rotenberg@greenwaves-technologies.com>"
+    - "Pasquale Davide Schiavone <pschiavo@iis.ee.ethz.ch>"
+    - "Andreas Traber <atraber@student.ethz.ch>"
+
+sources:
+  - apb2per.sv
